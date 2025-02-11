@@ -1,0 +1,9 @@
+# Ignorar el archivo .env
+.env
+
+# Ignorar los node_modules del backend
+viajes/node_modules/
+
+
+
+
