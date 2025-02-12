@@ -45,17 +45,23 @@ exports.deleteUsuario = async (req, res) => {
     }
 };
 
-// Registro de usuario
 exports.register = async (req, res) => {
     try {
+        console.log("Datos recibidos:", req.body);
+
+        // Solo un admin puede crear otro admin
+        if (req.body.rol && req.body.rol === "admin") {
+            return res.status(403).json({ mensaje: "No tienes permisos para crear un administrador" });
+        }
+
         const usuario = await Usuario.create(req.body);
         res.json({ mensaje: "Usuario registrado correctamente", usuario });
     } catch (error) {
+        console.error("Error al registrar usuario:", error);
         res.status(500).json({ error: error.message });
     }
 };
 
-// Login de usuario
 exports.login = async (req, res) => {
     try {
         const usuario = await Usuario.findOne({ where: { email: req.body.email } });
@@ -63,7 +69,12 @@ exports.login = async (req, res) => {
             return res.status(401).json({ mensaje: "Credenciales incorrectas" });
         }
 
-        const token = jwt.sign({ id: usuario.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+        const token = jwt.sign(
+            { id: usuario.id, rol: usuario.rol }, // Ahora el token incluye el rol
+            process.env.JWT_SECRET,
+            { expiresIn: "1h" }
+        );
+
         res.json({ mensaje: "Login exitoso", token });
     } catch (error) {
         res.status(500).json({ error: error.message });

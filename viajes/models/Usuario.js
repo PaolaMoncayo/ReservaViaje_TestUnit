@@ -7,8 +7,14 @@ const Usuario = sequelize.define("Usuario", {
     nombre: { type: DataTypes.STRING, allowNull: false },
     email: { type: DataTypes.STRING, unique: true, allowNull: false },
     password: { type: DataTypes.STRING, allowNull: false },
+    rol: { 
+        type: DataTypes.ENUM("admin", "usuario"), // Solo puede ser "admin" o "usuario"
+        defaultValue: "usuario", // Todos los usuarios nuevos serán "usuario" por defecto
+        allowNull: false
+    }
 });
 
+// Hash de la contraseña antes de guardar
 Usuario.beforeCreate(async (usuario) => {
     usuario.password = await bcrypt.hash(usuario.password, 10);
 });

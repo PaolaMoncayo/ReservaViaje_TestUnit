@@ -25,16 +25,21 @@ exports.createReserva = async (req, res) => {
     try {
         const { usuarioId, viajeId } = req.body;
 
+        //  1. Verificar que el usuario existe
         const usuario = await Usuario.findByPk(usuarioId);
         if (!usuario) return res.status(404).json({ mensaje: "Usuario no encontrado" });
 
+        //  2. Verificar que el viaje existe
         const viaje = await Viaje.findByPk(viajeId);
         if (!viaje) return res.status(404).json({ mensaje: "Viaje no encontrado" });
 
+        //  3. Verificar disponibilidad
         if (viaje.disponibilidad <= 0) return res.status(400).json({ mensaje: "No hay disponibilidad para este viaje" });
 
-        const reserva = await Reserva.create({ usuarioId, viajeId, estado: "confirmado" });
+        //  4. Crear la reserva con estado "pendiente"
+        const reserva = await Reserva.create({ usuarioId, viajeId, estado: "pendiente" });
 
+        //  5. Reducir disponibilidad del viaje
         await viaje.update({ disponibilidad: viaje.disponibilidad - 1 });
 
         res.json({ mensaje: "Reserva creada con éxito", reserva });

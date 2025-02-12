@@ -14,7 +14,7 @@ app.use("/api/pagos", require("./routes/pagoRoutes"));
 
 const iniciarServidor = async () => {
     try {
-        await sequelize.sync({ force: true }); // Reiniciar la base de datos en cada inicio
+        await sequelize.sync({ alter: true }); // Reiniciar la base de datos en cada inicio
         console.log("Base de datos sincronizada");
         app.listen(process.env.PORT, () => console.log(`Servidor en http://localhost:${process.env.PORT}`));
     } catch (error) {
